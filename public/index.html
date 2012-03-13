@@ -25,7 +25,8 @@
       <div class="content">
 
         <div id="create-todo">
-          <input id="new-todo" placeholder="What needs to be done?" type="text" />
+          <input id="new-todo" placeholder="What needs to be done?" type="text" class="description" />
+          <input id="new-complexity" placeholder="Points" type="text" class="points" />
           <span class="ui-tooltip-top" style="display:none;">Press Enter to save this task</span>
         </div>
 
@@ -62,16 +63,25 @@
         </div>
         <div class="edit">
           <input class="todo-input" type="text" value="" />
+          <input class="todo-complexity" type="text" value="" />
         </div>
       </div>
     </script>
 
     <script type="text/template" id="stats-template">
       <% if (total) { %>
-        <span class="todo-count">
+        <div class="todo-count">
           <span class="number"><%= remaining %></span>
-          <span class="word"><%= remaining == 1 ? 'item' : 'items' %></span> left.
-        </span>
+          <span class="word"><%= remaining == 1 ? 'item' : 'items' %></span> left
+        </div>
+        <div class="todo-completed-count">
+          <span class="number"><%= completed_points %></span>
+          <span class="complete">completed <%= completed_points == 1 ? 'point' : 'points' %></span>
+        </div>
+        <div class="todo-incomplete-count">
+          <span class="number"><%= incomplete_points %></span>
+          <span class="incomplete">incompleted <%= incomplete_points == 1 ? 'point' : 'points' %></span>
+        </div>
       <% } %>
       <% if (done) { %>
         <span class="todo-clear">

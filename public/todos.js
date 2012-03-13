@@ -9,13 +9,14 @@ $(function(){
   // Todo Model
   // ----------
 
-  // Our basic **Todo** model has `text`, `order`, and `done` attributes.
+  // Our basic **Todo** model has `text`, `order`, `points` and `done` attributes.
   window.Todo = Backbone.Model.extend({
 
     // Default attributes for a todo item.
     defaults: function() {
       return {
         done:  false,
+        points: 0,
         order: Todos.nextOrder()
       };
     },
@@ -48,6 +49,18 @@ $(function(){
     // Filter down the list to only todo items that are still not finished.
     remaining: function() {
       return this.without.apply(this, this.done());
+    },
+
+    completed_points: function() {
+      var sum = 0;
+      _.each(Todos.done(), function(todo) { sum = sum + parseInt(todo.get('points')); });
+      return sum;
+    },
+
+    incomplete_points: function() {
+      var sum = 0;
+      _.each(Todos.remaining(), function(todo) { sum = sum + parseInt(todo.get('points')); });
+      return sum;
     },
 
     // We keep the Todos in sequential order, despite being saved by unordered
@@ -84,7 +97,8 @@ $(function(){
       "click .check"              : "toggleDone",
       "dblclick div.todo-text"    : "edit",
       "click span.todo-destroy"   : "clear",
-      "keypress .todo-input"      : "updateOnEnter"
+      "keypress .todo-input"      : "updateOnEnter",
+      "keypress .todo-complexity"      : "updateOnEnter"
     },
 
     // The TodoView listens for changes to its model, re-rendering.
@@ -104,9 +118,13 @@ $(function(){
     // we use `jQuery.text` to set the contents of the todo item.
     setText: function() {
       var text = this.model.get('text');
-      this.$('.todo-text').text(text);
+      var points = this.model.get('points');
+
+      this.$('.todo-text').text(text + " - " + points + " points");
       this.input = this.$('.todo-input');
-      this.input.bind('blur', _.bind(this.close, this)).val(text);
+
+      this.input.bind('enter', _.bind(this.close, this)).val(text);
+      this.$('.todo-complexity').bind('enter', _.bind(this.close, this)).val(points);
     },
 
     // Toggle the `"done"` state of the model.
@@ -122,7 +140,9 @@ $(function(){
 
     // Close the `"editing"` mode, saving changes to the todo.
     close: function() {
-      this.model.save({text: this.input.val()});
+      var text = this.input.parent().find(".todo-input").val();
+      var points = this.input.parent().find(".todo-complexity").val();
+      this.model.save({text: text, points: points});
       $(this.el).removeClass("editing");
     },
 
@@ -159,7 +179,9 @@ $(function(){
     // Delegated events for creating new items, and clearing completed ones.
     events: {
       "keypress #new-todo":  "createOnEnter",
+      "keypress #new-complexity":  "createOnEnter",
       "keyup #new-todo":     "showTooltip",
+      "keyup #new-complexity":     "showTooltip",
       "click .todo-clear a": "clearCompleted"
     },
 
@@ -182,7 +204,9 @@ $(function(){
       this.$('#todo-stats').html(this.statsTemplate({
         total:      Todos.length,
         done:       Todos.done().length,
-        remaining:  Todos.remaining().length
+        remaining:  Todos.remaining().length,
+        completed_points: Todos.completed_points(),
+        incomplete_points: Todos.incomplete_points()
       }));
     },
 
@@ -202,9 +226,11 @@ $(function(){
     // create new **Todo** model persisting it to *localStorage*.
     createOnEnter: function(e) {
       var text = this.input.val();
+      var points = $("#new-complexity").val();
       if (!text || e.keyCode != 13) return;
-      Todos.create({text: text});
+      Todos.create({text: text, points: points});
       this.input.val('');
+      $("#new-complexity").val('');
     },
 
     // Clear all done todo items, destroying their models.

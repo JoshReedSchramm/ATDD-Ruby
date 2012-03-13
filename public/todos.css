@@ -60,8 +60,15 @@ html {
 #create-todo {
   position: relative;
 }
+  #create-todo input.description {
+    width: 378px;
+  }
+
+  #create-todo input.points {
+    width: 70px;
+  }
+
   #create-todo input {
-    width: 466px;
     font-size: 24px;
     font-family: inherit;
     line-height: 1.4em;
@@ -114,8 +121,13 @@ html {
     #todo-list .editing .edit {
       display: block;
     }
+    #todo-list .editing input.todo-input {
+      width: 355px;
+    }
+    #todo-list .editing input.todo-complexity {
+      width: 43px;
+    }
     #todo-list .editing input {
-      width: 444px;
       font-size: 24px;
       font-family: inherit;
       margin: 0;
@@ -161,6 +173,14 @@ html {
   margin-top: 10px;
   color: #777777;
 }
+  #todo-stats div {
+    float: left;
+    padding-right: 5px;
+  }
+    #todo-stats div .number {
+      font-weight: bold;
+      color: #333333;
+    }
   #todo-stats:after {
     content: "\0020";
     display: block;
@@ -169,13 +189,6 @@ html {
     overflow: hidden;
     visibility: hidden;
   }
-  #todo-stats .todo-count {
-    float: left;
-  }
-    #todo-stats .todo-count .number {
-      font-weight: bold;
-      color: #333333;
-    }
   #todo-stats .todo-clear {
     float: right;
   }
